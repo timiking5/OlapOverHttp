@@ -1,0 +1,6 @@
+@OlapOverHttp.Host_HostAddress = http://localhost:5078
+
+GET {{OlapOverHttp.Host_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

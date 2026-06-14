@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/common/">
+    <File Path="docker-compose.yml" />
+  </Folder>
+  <Project Path="OlapOverHttp.Clickhouse.Filler/OlapOverHttp.Clickhouse.Filler.csproj" />
+  <Project Path="OlapOverHttp.Postgres.Filler/OlapOverHttp.Postgres.Filler.csproj" />
+  <Project Path="OlapOverHttp.Schema/OlapOverHttp.Schema.csproj" />
+  <Project Path="OlapOverHttp.Host/OlapOverHttp.Host.csproj" Id="89d8f2d5-cb5d-4e0f-96c1-e9a5a2950bf0" />
+  <Project Path="OlapOverHttp.LoadTest/OlapOverHttp.LoadTest.csproj" Id="56f6b0f8-c6e2-4f61-a469-4c2f2ffb6143" />
+</Solution>
