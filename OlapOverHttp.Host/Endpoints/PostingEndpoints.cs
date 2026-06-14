@@ -11,9 +11,9 @@ public static class PostingEndpoints
         var group = endpoints.MapGroup("/api/postings");
 
         group.MapGet("/", GetPostings);
+
         group.MapGet("/report", DownloadReport);
         group.MapGet("/cached-report", DownloadCachedReport);
-        group.MapGet("/document-summary", GetDocumentSummary);
 
         return endpoints;
     }
@@ -25,14 +25,6 @@ public static class PostingEndpoints
         IPostingRepository repository,
         CancellationToken cancellationToken) =>
         Results.Ok(repository.Get(sellerId, from, to, cancellationToken));
-
-    private static IResult GetDocumentSummary(
-        long sellerId,
-        DateOnly from,
-        DateOnly to,
-        IPostingRepository repository,
-        CancellationToken cancellationToken) =>
-        Results.Ok(repository.GetDocumentSummary(sellerId, from, to, cancellationToken));
 
     private static async Task DownloadReport(
         long sellerId,

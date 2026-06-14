@@ -1,4 +1,4 @@
-﻿namespace OlapOverHttp.Host.Data;
+﻿namespace OlapOverHttp.Host.Excel;
 
 public sealed record PostingReportRow(
     DateOnly PostingDate,

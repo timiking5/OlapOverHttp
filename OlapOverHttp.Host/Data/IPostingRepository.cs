@@ -7,16 +7,4 @@ public interface IPostingRepository
         DateOnly periodStart,
         DateOnly periodEnd,
         CancellationToken token = default);
-
-    IAsyncEnumerable<PostingDocumentSummary> GetDocumentSummary(
-        long sellerId,
-        DateOnly periodStart,
-        DateOnly periodEnd,
-        CancellationToken token = default);
-
-    IAsyncEnumerable<PostingReportRow> GetReportRows(
-        long sellerId,
-        DateOnly periodStart,
-        DateOnly periodEnd,
-        CancellationToken token = default);
 }

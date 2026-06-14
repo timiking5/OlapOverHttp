@@ -1,4 +1,4 @@
-namespace OlapOverHttp.Host.ClickHouse;
+namespace OlapOverHttp.Host.ClickHouse.Infrastructure;
 
 public sealed class ClickHouseOptions
 {

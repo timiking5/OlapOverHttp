@@ -1,10 +1,9 @@
 ﻿using Gooseberry.ExcelStreaming;
-using OlapOverHttp.Host.Data;
 using System.Collections.Frozen;
 
 namespace OlapOverHttp.Host.Excel;
 
-public sealed class PostingExcelBuilder(IPostingRepository postingRepository)
+public sealed class PostingExcelBuilder(ReportDataProvider reportDataProvider)
 {
     private static readonly FrozenDictionary<sbyte, string> CurrencyMapping = new Dictionary<sbyte, string>
     {
@@ -59,7 +58,7 @@ public sealed class PostingExcelBuilder(IPostingRepository postingRepository)
     {
         await using var writer = new ExcelWriter(stream, token: token);
 
-        var rows = postingRepository.GetReportRows(sellerId, periodStart, periodEnd, token);
+        var rows = reportDataProvider.Get(sellerId, periodStart, periodEnd, token);
 
         await AddRows(writer, rows, periodStart, periodEnd, token);
 

@@ -1,4 +1,4 @@
-namespace OlapOverHttp.Host.Postgres;
+namespace OlapOverHttp.Host.Postgres.Infrastructure;
 
 public sealed class PostgresOptions
 {

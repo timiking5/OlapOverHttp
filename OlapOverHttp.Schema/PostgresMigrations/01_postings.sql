@@ -2,7 +2,7 @@
 CREATE SCHEMA IF NOT EXISTS "posting";
 
 CREATE TABLE IF NOT EXISTS "posting".postings(
-	id bigserial         PRIMARY KEY,
+	id                   bigserial PRIMARY KEY,
 	posting_id           bigint NOT NULL,
 	posting_name         text STORAGE MAIN NOT NULL,
 	seller_id            bigint NOT NULL,

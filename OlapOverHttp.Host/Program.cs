@@ -1,9 +1,10 @@
 using OlapOverHttp.Host.ClickHouse;
+using OlapOverHttp.Host.ClickHouse.Infrastructure;
 using OlapOverHttp.Host.Data;
 using OlapOverHttp.Host.Endpoints;
 using OlapOverHttp.Host.Excel;
 using OlapOverHttp.Host.Minio;
-using OlapOverHttp.Host.Postgres;
+using OlapOverHttp.Host.Postgres.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,10 +16,10 @@ builder.Services.AddMinio(builder.Configuration);
 builder.Services.AddSingleton<IPostingRepository, PostingRepository>();
 builder.Services.AddSingleton<PostingExcelBuilder>();
 builder.Services.AddSingleton<ObjectStorage>();
+builder.Services.AddSingleton<ReportDataProvider>();
 builder.Services.AddSingleton<CachedPostingReportGenerator>();
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();

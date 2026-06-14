@@ -7,5 +7,7 @@ public sealed record Postingtem(
     long ItemId,
     int ItemQuantity,
     decimal ItemTotal,
+    string PostingSource,
+    string PaymentMethod,
     string ShippingCity,
     string ShippingCountry);
