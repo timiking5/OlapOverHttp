@@ -1,6 +1,7 @@
 ﻿using OlapOverHttp.LoadTest;
+using System.Diagnostics;
 
-const int RequestsPerSecond = 80;
+const double RequestsPerSecond = 250;
 const int DurationSeconds = 30;
 
 var from = new DateOnly(2026, 05, 13);
@@ -9,15 +10,26 @@ var sellerIds = LoadSellerIds("seller_ids.csv");
 using var http = new HttpClient { BaseAddress = new Uri("https://localhost:7098") };
 
 var loadTest = LoadTestFactory.GetLoadTestGenerator(
-    LoadTestFactory.GetCachedReports,
+    LoadTestFactory.GetHotColdPostings,
     http,
     sellerIds,
     from);
 
-using var timer = new Timer(async _ => await loadTest.Request(), null, 0, 1000 / RequestsPerSecond);
+var results = new List<Task>(capacity: (int)(DurationSeconds * RequestsPerSecond));
+var interval = TimeSpan.FromSeconds(1) / RequestsPerSecond;
+var end = Stopwatch.GetTimestamp() + Stopwatch.Frequency * DurationSeconds;
+var next = Stopwatch.GetTimestamp();
 
-await Task.Delay(DurationSeconds * 1000);
-timer.Dispose();
+while (Stopwatch.GetTimestamp() < end)
+{
+    results.Add(loadTest.Request()); // or await with concurrency control
+    next += (long)(interval.TotalSeconds * Stopwatch.Frequency);
+    var delay = (next - Stopwatch.GetTimestamp()) * 1000.0 / Stopwatch.Frequency;
+    if (delay > 0)
+        await Task.Delay((int)Math.Ceiling(delay));
+}
+
+await Task.WhenAll(results);
 
 loadTest.PrintResults(RequestsPerSecond, DurationSeconds, sellerIds.Count);
 

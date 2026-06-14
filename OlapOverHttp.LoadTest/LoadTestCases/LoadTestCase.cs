@@ -11,7 +11,7 @@ public abstract class LoadTestCase
 
     public abstract Task Request();
 
-    public virtual void PrintResults(int rps, int duration, int sellers)
+    public virtual void PrintResults(double rps, int duration, int sellers)
     {
         Console.WriteLine($"Load test: {rps} rps for {duration}s ({sellers} sellers)");
 
