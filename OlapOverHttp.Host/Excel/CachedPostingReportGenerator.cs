@@ -30,7 +30,7 @@ public sealed class CachedPostingReportGenerator(
         {
             await GenerateCachedReport(request, token);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return null;
         }

@@ -2,7 +2,7 @@
 
 namespace OlapOverHttp.LoadTest.LoadTestCases;
 
-public sealed class PostingLoadTest(
+public sealed class HotColdLoadTestCase(
     HttpClient client,
     List<long> sellerIds,
     DateOnly from
@@ -14,7 +14,7 @@ public sealed class PostingLoadTest(
         var startDate = GetRandomDate(from);
         var endPath = startDate.AddMonths(1);
 
-        var path = $"/api/postings?sellerId={sellerId}&from={startDate:yyyy-MM-dd}&to={endPath:yyyy-MM-dd}";
+        var path = $"/api/postings/hot-cold?sellerId={sellerId}&from={startDate:yyyy-MM-dd}&to={endPath:yyyy-MM-dd}";
 
         var sw = Stopwatch.StartNew();
         try
@@ -35,4 +35,7 @@ public sealed class PostingLoadTest(
             requestCount++;
         }
     }
+
+    protected override DateOnly GetRandomDate(DateOnly from)
+        => from.AddDays(Random.Next(0, 30));
 }

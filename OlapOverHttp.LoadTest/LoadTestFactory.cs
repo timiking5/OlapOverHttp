@@ -21,7 +21,7 @@ public static class LoadTestFactory
         return loadTestCase switch
         {
             GetPostings => new PostingLoadTest(client, sellerIds, from),
-            GetHotColdPostings => throw new NotImplementedException(),
+            GetHotColdPostings => new HotColdLoadTestCase(client, sellerIds, from),
             GetReports => new ReportLoadTest(client, sellerIds, from),
             GetCachedReports => new CachedReportLoadTestCase(client, sellerIds, from),
             _ => throw new ArgumentOutOfRangeException(nameof(loadTestCase)),

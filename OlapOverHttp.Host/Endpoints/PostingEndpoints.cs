@@ -11,7 +11,7 @@ public static class PostingEndpoints
         var group = endpoints.MapGroup("/api/postings");
 
         group.MapGet("/", GetPostings);
-
+        group.MapGet("/hot-cold", GetHoldColdPostings);
         group.MapGet("/report", DownloadReport);
         group.MapGet("/cached-report", DownloadCachedReport);
 
@@ -22,9 +22,17 @@ public static class PostingEndpoints
         long sellerId,
         DateOnly from,
         DateOnly to,
-        IPostingRepository repository,
+        [FromKeyedServices("longterm")] IPostingRepository repository,
         CancellationToken cancellationToken) =>
         Results.Ok(repository.Get(sellerId, from, to, cancellationToken));
+
+    private static IResult GetHoldColdPostings(
+        long sellerId,
+        DateOnly from,
+        DateOnly to,
+        PostingRepositoryFactory factory,
+        CancellationToken cancellationToken) =>
+        Results.Ok(factory.GetRepository(from).Get(sellerId, from, to, cancellationToken));
 
     private static async Task DownloadReport(
         long sellerId,

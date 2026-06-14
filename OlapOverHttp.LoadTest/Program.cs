@@ -1,9 +1,9 @@
 ﻿using OlapOverHttp.LoadTest;
 
-const int RequestsPerSecond = 20;
+const int RequestsPerSecond = 80;
 const int DurationSeconds = 30;
 
-var from = new DateOnly(2025, 06, 13);  // min date in clickhouse
+var from = new DateOnly(2026, 05, 13);
 var sellerIds = LoadSellerIds("seller_ids.csv");
 
 using var http = new HttpClient { BaseAddress = new Uri("https://localhost:7098") };

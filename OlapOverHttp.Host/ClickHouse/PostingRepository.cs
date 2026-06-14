@@ -51,7 +51,7 @@ public sealed class PostingRepository(IClickHouseConnectionFactory connectionFac
                 item_ids as item_id,
                 item_quantities as item_quantity,
                 marketplace_item_prices as marketplace_item_price
-            GROUP BY posting_id, item_id, shipping_city, shipping_country
+            GROUP BY posting_id, item_id, posting_source, payment_method, shipping_city, shipping_country
             """);
 
         // command.Parameters.AddWithValue("sellerId", sellerId);
@@ -67,7 +67,7 @@ public sealed class PostingRepository(IClickHouseConnectionFactory connectionFac
                 PostingDate: reader.GetDateTimeOffset(2).DateTime,
                 DeliveryDate: reader.GetDateTimeOffset(3).DateTime,
                 ItemId: reader.GetInt64(4),
-                ItemQuantity: reader.GetInt32(5),
+                ItemQuantity: (int)reader.GetInt64(5),
                 ItemTotal: reader.GetDecimal(6),
                 PostingSource: reader.GetString(7),
                 PaymentMethod: reader.GetString(8),
