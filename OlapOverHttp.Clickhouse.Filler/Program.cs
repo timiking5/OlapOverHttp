@@ -2,21 +2,34 @@
 using Octonica.ClickHouseClient;
 using SharpJuice.Clickhouse;
 
-const int PostingsPerMonth = 2_000_000;
-const int MonthsInPeriod = 12;
-const int TotalPostings = PostingsPerMonth * MonthsInPeriod;
 const int InsertBatchSize = 10_000;
 const int ParallelWorkers = 10;
-const string ConnectionStringEnvVar = "CLICKHOUSE_CONNECTION_STRING";
 const string SellerIdsFile = "seller_ids.csv";
+
+var postingsPerMonth = 2_000_000;
+var periodEnd = DateTime.UtcNow;
+var periodStart = periodEnd.AddYears(-1);
+
+for (var i = 0; i < args.Length; i++)
+    switch (args[i])
+    {
+        case "--postings-per-month":
+            postingsPerMonth = int.Parse(args[++i]);
+            break;
+        case "--period-start":
+            periodStart = DateTime.Parse(args[++i]);
+            break;
+        case "--period-end":
+            periodEnd = DateTime.Parse(args[++i]);
+            break;
+    }
+
+if (!args.Contains("--period-start"))
+    periodStart = periodEnd.AddYears(-1);
 
 var connectionFactory = new ClickHouseConnectionFactory(GetConnectionSettings());
 
 var sellerIds = LoadSellerIds(SellerIdsFile);
-
-Console.WriteLine(
-    $"Loaded {sellerIds.Count} sellers. Generating {TotalPostings:N0} postings " +
-    $"({PostingsPerMonth:N0}/month × {MonthsInPeriod} months)...");
 
 var postingsWriter = new TableWriterBuilder(connectionFactory)
     .For<PostingRow>("postings")
@@ -39,19 +52,23 @@ var postingsWriter = new TableWriterBuilder(connectionFactory)
     .AddColumn("version", x => x.Version)
     .Build();
 
-var periodEnd = DateTime.UtcNow;
-var periodStart = periodEnd.AddYears(-1);
+var monthIsPeriod = (periodEnd.Year - periodStart.Year) * 12 + (periodEnd.Month - periodStart.Month);
+int totalPostings = postingsPerMonth * monthIsPeriod;
+
+Console.WriteLine(
+    $"Loaded {sellerIds.Count} sellers. Generating {totalPostings:N0} postings " +
+    $"({postingsPerMonth:N0}/month × {monthIsPeriod} months)...");
 
 var insertedPostingRows = 0L;
 var completedMonths = 0;
 
 await Parallel.ForEachAsync(
-    Enumerable.Range(0, MonthsInPeriod),
+    Enumerable.Range(0, monthIsPeriod),
     new ParallelOptions { MaxDegreeOfParallelism = ParallelWorkers },
     async (monthIndex, cancellationToken) =>
     {
-        var firstPostingIndex = (long)monthIndex * PostingsPerMonth;
-        var lastPostingIndex = firstPostingIndex + PostingsPerMonth;
+        var firstPostingIndex = (long)monthIndex * postingsPerMonth;
+        var lastPostingIndex = firstPostingIndex + postingsPerMonth;
         var postingBatch = new List<PostingRow>(InsertBatchSize);
 
         for (var postingIndex = firstPostingIndex; postingIndex < lastPostingIndex; postingIndex++)
@@ -63,7 +80,7 @@ await Parallel.ForEachAsync(
                 periodStart,
                 periodEnd,
                 monthIndex,
-                MonthsInPeriod));
+                monthIsPeriod));
 
             if (postingBatch.Count >= InsertBatchSize)
             {
@@ -80,21 +97,13 @@ await Parallel.ForEachAsync(
         }
 
         var completed = Interlocked.Increment(ref completedMonths);
-        Console.WriteLine($"Month {completed}/{MonthsInPeriod} finished.");
+        Console.WriteLine($"Month {completed}/{monthIsPeriod} finished.");
     });
 
-Console.WriteLine(
-    $"Done. Inserted {insertedPostingRows:N0} posting rows for {TotalPostings:N0} postings.");
+Console.WriteLine($"Done. Inserted {insertedPostingRows:N0} posting rows for {totalPostings:N0} postings.");
 
 static ClickHouseConnectionSettings GetConnectionSettings()
 {
-    var connectionString = Environment.GetEnvironmentVariable(ConnectionStringEnvVar);
-
-    if (!string.IsNullOrWhiteSpace(connectionString))
-    {
-        return new ClickHouseConnectionStringBuilder(connectionString).BuildSettings();
-    }
-
     return new ClickHouseConnectionStringBuilder
     {
         Host = "localhost",

@@ -7,6 +7,16 @@ const int ParallelWeeks = 4;
 var periodEnd = new DateTime(2026, 06, 13);
 var periodStart = periodEnd.AddMonths(-2);
 
+for (var i = 0; i < args.Length; i++)
+    switch (args[i])
+    {
+        case "--period-start": periodStart = DateTime.Parse(args[++i]); break;
+        case "--period-end": periodEnd = DateTime.Parse(args[++i]); break;
+    }
+
+if (!args.Contains("--period-start"))
+    periodStart = periodEnd.AddMonths(-2);
+
 var clickHouseSettings = GetClickHouseConnectionSettings();
 var postgresConnectionString = "Host=localhost;Port=5432;Username=postgres;Password=postgres;Database=posting";
 
